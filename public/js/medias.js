@@ -4,6 +4,7 @@ const startUploadButton = document.getElementById('startUpload');
 const fileInput = document.getElementById('fileInput');
 const labelFileName = document.getElementById('fileName');
 let countPage = 0;
+let counterObj = { val: 0 };
 const activeClasses = 'active'
 const loadingMedias = document.getElementById('loadingMedias');
 const previewImage = document.getElementById('preview-image');
@@ -41,6 +42,14 @@ startUploadButton.addEventListener('click', function () {
 resumable.on('fileProgress', function (file) {
     let progress = Math.floor(file.progress() * 100);
     startUploadButton.innerHTML = ' <i class="fas fa-upload mr-2"></i> Đang tải lên ' + progress + '%';
+    gsap.to(counterObj, {
+        val: progress,
+        duration: 0.5,
+        ease: "power1.out",
+        onUpdate: () => {
+            startUploadButton.innerText = Math.floor(counterObj.val) + '%';
+        }
+    });
     if(progress === 100){
         resumable.cancel();
         fileInput.value = '';
