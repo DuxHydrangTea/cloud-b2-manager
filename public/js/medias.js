@@ -25,6 +25,7 @@ resumable.assignBrowse(fileInput);
 
 resumable.on('fileAdded', function (file) {
     labelFileName.innerText = file.fileName;
+    startUploadButton.innerHTML = ' <i class="fas fa-upload mr-2"></i> Tải lên ';
 });
 
 startUploadButton.addEventListener('click', function () {
@@ -33,19 +34,19 @@ startUploadButton.addEventListener('click', function () {
         return;
     }
     this.disabled = true;
-    startUploadButton.innerHTML = loadingIcon;
+    // startUploadButton.innerHTML = loadingIcon;
     resumable.upload();
 });
 
 resumable.on('fileProgress', function (file) {
     let progress = Math.floor(file.progress() * 100);
-
+    startUploadButton.innerHTML = ' <i class="fas fa-upload mr-2"></i> Đang tải lên ' + progress + '%';
     if(progress === 100){
         resumable.cancel();
         fileInput.value = '';
         labelFileName.innerText = 'Chọn file';
         startUploadButton.disabled = false;
-        startUploadButton.innerHTML = ' <i class="fas fa-upload mr-2"></i> Tải lên ';
+        startUploadButton.innerHTML = ' <i class="fas fa-upload mr-2"></i> Tải lên ' + 'thành công!';
         fetchMedia();
     }
 });
@@ -152,6 +153,7 @@ const handleDeleteItem = (button) => {
     button.disabled = true;
     button.innerHTML = loadingIcon;
     const mediaItem = button.closest('.media-item');
+    mediaItem.classList.add(['border-red-400'])
     const id = button.getAttribute('data-id');
 
     axios.delete(window.route('deleteFile'),{
@@ -161,7 +163,7 @@ const handleDeleteItem = (button) => {
         }
     }).then(res => {
         if(res.data){
-            mediaItem.classList.add('scale-[0]');
+            mediaItem.classList.add('scale-[0]', 'opacity-[0]');
 
             setTimeout(function(){
                 mediaItem.remove();

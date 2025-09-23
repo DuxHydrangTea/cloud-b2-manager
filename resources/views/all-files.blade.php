@@ -64,7 +64,7 @@
                             <p class="text-sm text-gray-500">Kéo thả file hoặc click để chọn</p>
                         </div>
 
-                        <input id="fileInput" type="file" class="hidden" multiple accept="image/*">
+                        <input id="fileInput" type="file" class="hidden" multiple accept=".jpg,.jpeg,.png,.gif,.webp">
                     </label>
                 </div>
             </div>
