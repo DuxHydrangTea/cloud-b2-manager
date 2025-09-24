@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\UploadToB2Queue;
 use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -68,7 +69,6 @@ class UploadController extends Controller
     }
 
     public function res(){
-        dd(storage_path('app/public'), Storage::disk('public')->path(''));
         $path = 'res.zip';
         $zipAbsolutePath = Storage::disk('public')->path($path);
         [$extractPath, $folderName, $folderPath]= $this->getNewFolderName($path);
@@ -76,7 +76,8 @@ class UploadController extends Controller
         if ($zip->open($zipAbsolutePath) === TRUE) {
             $zip->extractTo($extractPath);
             $zip->close();
-            $this->uploadFolder($folderName);
+            // $this->uploadFolder($folderName);
+            UploadToB2Queue::dispatch($folderName);
             return "Giải nén thành công vào: {$extractPath}";
         } else {
             return "Không thể mở file zip.";
