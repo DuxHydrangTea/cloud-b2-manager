@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use PhpZip\ZipFile;
+use ZipArchive;
 
 class UploadController extends Controller
 {
@@ -17,7 +20,7 @@ class UploadController extends Controller
     public function handlePost(Request $request){
         $file = $request->file('file');
         $fileName = time() . $file->getClientOriginalName();
-        $path = $file->storeAs('key2', $fileName, 'b2');
+        $path = $file->storeAs('', $fileName, 'public');
 
         return response()->json([
             'success' => true,
@@ -36,7 +39,7 @@ class UploadController extends Controller
         $cacheKey = "media_page_{$page}_per_{$perPage}";
 
         $images = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($perPage) {
-            return Media::orderBy('created_at', 'desc')->paginate($perPage);
+            return Media::image()->orderBy('created_at', 'desc')->paginate($perPage);
         });
 
         Cache::remember('media_api_page_count', now()->addMinutes(5), fn() => $images->lastPage());
@@ -64,5 +67,49 @@ class UploadController extends Controller
         return Storage::disk('b2')->download($path);
     }
 
+    public function res(){
+        dd(storage_path('app/public'), Storage::disk('public')->path(''));
+        $path = 'res.zip';
+        $zipAbsolutePath = Storage::disk('public')->path($path);
+        [$extractPath, $folderName, $folderPath]= $this->getNewFolderName($path);
+        $zip = new ZipArchive;
+        if ($zip->open($zipAbsolutePath) === TRUE) {
+            $zip->extractTo($extractPath);
+            $zip->close();
+            $this->uploadFolder($folderName);
+            return "Giải nén thành công vào: {$extractPath}";
+        } else {
+            return "Không thể mở file zip.";
+        }
+    }
+
+    private function getNewFolderName($path){
+        $folderName = pathinfo($path, PATHINFO_FILENAME);
+        $extractPath = Storage::disk('public')->path($folderName);
+
+        if (!Storage::disk('public')->exists($folderName)) {
+            Storage::disk('public')->makeDirectory($folderName);
+        }
+
+        return [$extractPath, $folderName, Storage::disk('public')->path($folderName)];
+
+    }
+
+    private function uploadFolder($folderName, $prefix = ''){
+        $files = File::allFiles(Storage::disk('public')->path($folderName));
+
+        foreach ($files as $file) {
+            $relativePath = str_replace(
+                storage_path('app/public'),
+                '',
+                $file->getPathname()
+            );
+
+            Storage::disk('b2')->put(
+                $prefix . $relativePath,
+                file_get_contents($file->getRealPath())
+            );
+        }
+    }
 
 }

@@ -25,6 +25,7 @@ const resumable = new Resumable({
 resumable.assignBrowse(fileInput);
 
 resumable.on('fileAdded', function (file) {
+    counterObj.val = 0;
     labelFileName.innerText = file.fileName;
     startUploadButton.innerHTML = ' <i class="fas fa-upload mr-2"></i> Tải lên ';
 });
@@ -41,7 +42,6 @@ startUploadButton.addEventListener('click', function () {
 
 resumable.on('fileProgress', function (file) {
     let progress = Math.floor(file.progress() * 100);
-    startUploadButton.innerHTML = ' <i class="fas fa-upload mr-2"></i> Đang tải lên ' + progress + '%';
     gsap.to(counterObj, {
         val: progress,
         duration: 0.5,
@@ -56,7 +56,9 @@ resumable.on('fileProgress', function (file) {
         labelFileName.innerText = 'Chọn file';
         startUploadButton.disabled = false;
         startUploadButton.innerHTML = ' <i class="fas fa-upload mr-2"></i> Tải lên ' + 'thành công!';
-        fetchMedia();
+        setTimeout(function () {
+            fetchMedia();
+        }, 500)
     }
 });
 

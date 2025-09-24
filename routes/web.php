@@ -8,6 +8,7 @@ Route::group([
     'controller' => UploadController::class,
 ], function () {
     Route::get('/', 'index')->name('home');
+    Route::get('/res', 'res')->name('res');
     Route::post('/handle-post', 'handlePost')->name('handlePost');
     Route::get('/get-all', 'getAll')->name('getAll');
     Route::get('/api/get-all', 'apiGetAll')->name('apiGetAll');
