@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/resumablejs@1.1.0/resumable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         window.csrf_token = '{{ csrf_token() }}'
     </script>
@@ -79,9 +80,34 @@
                 <p class="mb-2"><i class="fas fa-info-circle mr-2"></i>Hỗ trợ: JPG, PNG, GIF</p>
                 <p><i class="fas fa-desktop mr-2"></i>Kích thước: 100x100px</p>
             </div>
+
+            <button id="test-time-upload" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center">
+                Upload
+            </button>
         </div>
     </div>
-
+    <script>
+        $('#test-time-upload').on('click', function () {
+            const startTime = Date.now();
+            timer = setInterval(() => {
+                const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                console.log(`⏱️ Đang upload... ${elapsed} giây`);
+                $('#test-time-upload').text(`Đang upload... ${elapsed} giây`);
+            }, 1000); // Cập nhật mỗi giây
+            axios.get(window.route('res'))
+                .then(response => {
+                    clearInterval(timer);
+                    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+                    console.log(`✅ Upload hoàn tất sau ${duration} giây`);
+                    $('#test-time-upload').text(`Upload hoàn tất sau ${duration} giây`);
+                })
+                .catch(error => {
+                    clearInterval(timer);
+                    console.error('❌ Upload lỗi:', error);
+                    $('#test-time-upload').text('Upload lỗi. Thử lại');
+            });
+        });
+    </script>
     <script src="{{ asset('js/medias.js') }}"></script>
 </body>
 </html>

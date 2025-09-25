@@ -30,6 +30,8 @@ class UploadController extends Controller
     }
 
     public function getAll(){
+        $files = Storage::disk('cl')->allFiles();
+        dd($files);
         return view('all-files');
     }
 
@@ -69,7 +71,7 @@ class UploadController extends Controller
     }
 
     public function res(){
-        $path = 'res.zip';
+        $path = 'resource.zip';
         $zipAbsolutePath = Storage::disk('public')->path($path);
         [$extractPath, $folderName, $folderPath]= $this->getNewFolderName($path);
         $zip = new ZipArchive;
@@ -77,10 +79,24 @@ class UploadController extends Controller
             $zip->extractTo($extractPath);
             $zip->close();
             // $this->uploadFolder($folderName);
-            UploadToB2Queue::dispatch($folderName);
-            return "Giải nén thành công vào: {$extractPath}";
+            // UploadToB2Queue::dispatch($folderName);
+            $files = File::allFiles(Storage::disk('public')->path($folderName));
+
+            foreach ($files as $file) {
+                $relativePath = str_replace(
+                    storage_path('app/public'),
+                    '',
+                    $file->getPathname()
+                );
+
+                Storage::disk('cl')->put(
+                    $relativePath,
+                    file_get_contents($file->getRealPath())
+                );
+            }
+            return true;
         } else {
-            return "Không thể mở file zip.";
+            return false;
         }
     }
 
