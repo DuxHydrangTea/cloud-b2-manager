@@ -30,9 +30,8 @@ class UploadController extends Controller
     }
 
     public function getAll(){
-        $files = Storage::disk('cl')->allFiles();
-        dd($files);
-        return view('all-files');
+        $files = Storage::disk('cl')->url('/res/profile.html');
+        return view('all-files', compact('files'));
     }
 
     public function apiGetAll(Request $request){
@@ -71,15 +70,13 @@ class UploadController extends Controller
     }
 
     public function res(){
-        $path = 'resource.zip';
+        $path = 'res.zip';
         $zipAbsolutePath = Storage::disk('public')->path($path);
         [$extractPath, $folderName, $folderPath]= $this->getNewFolderName($path);
         $zip = new ZipArchive;
         if ($zip->open($zipAbsolutePath) === TRUE) {
             $zip->extractTo($extractPath);
             $zip->close();
-            // $this->uploadFolder($folderName);
-            // UploadToB2Queue::dispatch($folderName);
             $files = File::allFiles(Storage::disk('public')->path($folderName));
 
             foreach ($files as $file) {
@@ -89,12 +86,12 @@ class UploadController extends Controller
                     $file->getPathname()
                 );
 
-                Storage::disk('cl')->put(
+                Storage::disk('cl_put')->put(
                     $relativePath,
                     file_get_contents($file->getRealPath())
                 );
             }
-            return true;
+            return $relativePath;
         } else {
             return false;
         }

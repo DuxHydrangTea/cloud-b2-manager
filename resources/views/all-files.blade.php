@@ -36,7 +36,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
     <div class="w-[400px]  bg-white h-[400px] mr-2 rounded shadow p-2">
-        <img src="" width="100%" alt="" srcset="" class="rounded" id="preview-image">
+        <img src="{{ $files }}" width="100%" alt="" srcset="" class="rounded" id="preview-image">
     </div>
     <div class="bg-white rounded-xl shadow-lg w-full max-w-6xl flex flex-col md:flex-row h-[80vh]">
         <div class="md:w-3/4 p-6 overflow-y-auto flex flex-col justify-between">

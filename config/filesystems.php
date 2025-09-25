@@ -86,6 +86,19 @@ return [
             'visibility' => 'public',
         ],
 
+        'cl_put' => [
+            'driver' => 's3',
+            'key' => env('CLOUDFLARE_ACCESS_KEY_ID'),
+            'secret' => env('CLOUDFLARE_SECRET_ACCESS_KEY'),
+            'region' => env('CLOUDFLARE_DEFAULT_REGION'),
+            'bucket' => env('CLOUDFLARE_BUCKET'),
+            'endpoint' => env('CLOUDFLARE_ENDPOINT_PUT'),
+            'use_path_style_endpoint' => env('CLOUDFLARE_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => true,
+            'report' => false,
+            'visibility' => 'public',
+        ],
+
     ],
 
     /*
